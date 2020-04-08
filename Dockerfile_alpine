@@ -1,0 +1,10 @@
+FROM alpine
+COPY sysbench.tar.gz /tmp/
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && apk update \
+ && apk add --no-cache autoconf automake pkgconf make libtool libaio-dev g++ \
+ && tar -xf /tmp/sysbench.tar.gz -C /root/ \
+ && cd /root/sysbench/ && ./autogen.sh && ./configure --without-mysql && make -j && make install \
+ && apk del --purge autoconf automake pkgconf make libtool g++ \
+ && apk add --no-cache gcc \
+ && rm -rf /var/cache/apk/* && rm -rf /var/lib/apk/* && rm -rf /etc/apk/cache/* \
+ && rm /tmp/sysbench.tar.gz && cd /root/ && rm -rf sysbench/
